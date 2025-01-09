@@ -1,6 +1,5 @@
 # Netflix Movies and TV Shows Data Analysis using SQL
 
-![]()
 
 ## Overview
 This project involves a comprehensive analysis of Netflix's movies and TV shows data using SQL. The goal is to extract valuable insights and answer various business questions based on the dataset. The following README provides a detailed account of the project's objectives, business problems, solutions, findings, and conclusions.
@@ -28,7 +27,7 @@ CREATE TABLE netflix (
 	director VARCHAR(250),
 	casts VARCHAR(800),
 	country	VARCHAR(150),
-	date_added	VARCHAR(50),
+	date_added VARCHAR(50),
 	release_year INT,
 	rating VARCHAR(10),
 	duration VARCHAR(50),
