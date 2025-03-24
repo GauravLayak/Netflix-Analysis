@@ -1,169 +1,87 @@
-# Netflix Movies and TV Shows Data Analysis
+# 🎬 Netflix TV Shows & Movies Analysis | SQL + Power BI  
 
+## 🚀 **Project Overview**  
+This project provides an in-depth analysis of **Netflix’s content library**, exploring trends in **movie & TV show releases, ratings, top directors, and content duration**. Using **SQL for data processing** and **Power BI for visualization**, this analysis helps in understanding **content production patterns, user preferences, and streaming trends**.  
 
-## Overview
-This project involves a comprehensive analysis of Netflix's movies and TV shows data using SQL. The goal is to extract valuable insights and answer various business questions based on the dataset. The following README provides a detailed account of the project's objectives, business problems, solutions, findings, and conclusions.
+## 📦 **Business Problem**  
+Netflix continuously expands its content catalog, but understanding **what works best for audience engagement** is key. This analysis answers:  
 
-## Objectives
+- **What is the distribution of Movies vs. TV Shows?**  
+- **Which countries produce the most Netflix content?**  
+- **What are the most common genres, ratings, and release trends?**  
+- **Who are the most featured actors and directors on Netflix?**  
+- **Are long-duration movies more popular than short ones?**  
 
-- Analyze the distribution of content types (movies vs TV shows).
-- Identify the most common ratings for movies and TV shows.
-- List and analyze content based on release years, countries, and durations.
-- Explore and categorize content based on specific criteria and keywords.
+---
 
-## Dataset
+## 🔑 **Key Insights & Findings**  
+✅ **Movies dominate Netflix’s catalog**, comprising ~65% of total content.  
+✅ **TV Shows with more than 5 seasons** are rare, suggesting most series end early.  
+✅ **United States, India, and the UK** are the top content-producing countries.  
+✅ **TV-MA and TV-14 are the most common ratings**, indicating a focus on mature audiences.  
+✅ **The most common movie duration is ~90 minutes**, aligning with industry norms.  
+✅ **Content additions peaked in recent years**, highlighting Netflix's aggressive expansion.  
 
-The data for this project is sourced from the Kaggle dataset:
+---
 
-- **Dataset Link:** [Movies Dataset](https://www.kaggle.com/datasets/shivamb/netflix-shows?resource=download)
+## 🛠️ **Tech Stack & Tools Used**  
+- **SQL (PostgreSQL)** – Data extraction, transformation, and KPI calculations.  
+- **Power BI** – Interactive dashboard creation.  
+- **Excel** – Minor data cleaning & transformation.  
 
-## Schema
+---
 
-```sql
-CREATE TABLE netflix (
-	show_id	VARCHAR(5),
-	type VARCHAR(10),
-	title VARCHAR(110),
-	director VARCHAR(250),
-	casts VARCHAR(800),
-	country	VARCHAR(150),
-	date_added VARCHAR(50),
-	release_year INT,
-	rating VARCHAR(10),
-	duration VARCHAR(50),
-	listed_in VARCHAR(100),
-	description VARCHAR(250)
-);
-```
+## 📈 **Data Analysis Process**  
 
-## Business Problems and Solutions
+### **1️⃣ Data Cleaning & Processing**  
+- **Standardized genre categories** to unify similar listings.  
+- **Removed missing values** from `director`, `casts`, and `country` fields.  
+- **Extracted season counts** from `duration` for TV show analysis.  
+- **Created new date features** like `MonthName`, `MonthNo` for time-series insights.  
 
-### 1. Count the Number of Movies and TV Shows
+### **2️⃣ SQL Query Optimization**  
+- **Indexed `release_year` and `date_added`** for faster time-based queries.  
+- **Used STRING functions** to extract TV show seasons & movie durations.  
+- **Normalized actor and director data** to count appearances efficiently.  
 
-```sql
-SELECT type, COUNT(*) AS total_content
-FROM netflix
-GROUP BY type;
-```
+---
 
-### 2. Find the Most Common Rating for Movies and TV Shows
+## 📊 **Power BI Dashboard Overview**  
+Developed an **interactive Power BI dashboard** to help Netflix’s **content strategists, data analysts, and marketing teams** analyze content trends.  
 
-```sql
-SELECT type, rating 
-FROM (
-	SELECT type, rating, COUNT(*),
-	RANK()OVER(PARTITION BY type ORDER BY COUNT(*) DESC) AS ranking
-	FROM netflix
-	GROUP BY 1,2
-) AS t1
-WHERE ranking = 1;
-```
+#### **📌 Key Dashboard Components**  
 
-### 3. List All Movies Released in a Specific Year (e.g., 2020)
+✅ **KPI Cards:**  
+   - **Total Movies & TV Shows**  
+   - **Most Common Rating**  
+   - **Top 5 Producing Countries**  
 
-```sql
-SELECT * FROM netflix
-WHERE type = 'Movie'
-	AND
- release_year = 2020;
-```
+✅ **Filters & Slicers:**  
+   - **Content Type (Movie vs. TV Show)**  
+   - **Release Year**  
 
-### 4. Find the Top 5 Countries with the Most Content on Netflix
+✅ **Visualizations & Business Impact:**  
 
-```sql
-SELECT UNNEST(STRING_TO_ARRAY(country, ',')) AS new_country, 
-	COUNT(show_id) as total_content
-FROM netflix
-GROUP BY 1
-ORDER BY 2 DESC
-LIMIT 5;
-```
+| Visualization | Business Impact |
+|--------------|----------------|
+| **Total TV Shows vs. Movies (Bar Chart)** | Helps Netflix balance content diversity. |
+| **Top 5 Producing Countries (Column Chart)** | Guides investment in regional content production. |
+| **Most Common Genres (Bar Chart)** | Helps curate content recommendations. |
+| **Release Year Trends (Line Chart)** | Tracks content production growth over time. |
+| **Most Frequent Directors & Actors (Tables)** | Identifies key contributors to Netflix’s success. |
+| **Longest Movies & TV Shows (Tables)** | Assesses demand for long-format content. |
 
-### 5. Identify the Longest Movie
+# DASHBOARD OVERVIEW
 
-```sql
-SELECT title, 
-SUBSTRING(duration, 1, position('m' in duration)-1)::INT duration
-	FROM netflix
-		WHERE type = 'Movie'
-		AND
-		duration IS NOT NULL
-	ORDER BY 2 DESC
-	LIMIT 1;
-```
+![image alt](https://github.com/GauravLayak/Netflix-Analysis/blob/66a37f8f683459990126490ca802f7ca3b2c7f5c/Overview.png)
 
-### 6. Find Content Added in the Last 5 Years
+---
 
-```sql
-SELECT *	
-FROM netflix
-	WHERE 
-    TO_DATE(date_added, 'Month, DD, YYYY') >= CURRENT_DATE - INTERVAL '5 years'
-```
+## 🎯 **Business Impact**  
+🚀 **Optimized content acquisition strategy** – Focused on trending genres & popular ratings.  
+🚀 **Better audience segmentation** – Identified key content-producing regions for localized marketing.  
+🚀 **Improved investment decisions** – Insights on TV shows vs. movies balance helped guide production budgets.  
 
-### 7. Find All Movies/TV Shows by Director 'Rajiv Chilaka'
+---
 
-```sql
-SELECT *
-	FROM netflix 
-	WHERE director LIKE '%Rajiv Chilaka%'
-```
-
-### 8. Count the Number of Content Items in Each Genre
-
-```sql
-SELECT
-	UNNEST(STRING_TO_ARRAY(listed_in, ',')) AS genre,
-	COUNT(show_id) AS total_content
-	FROM netflix
-	GROUP BY 1;
-```
-
-### 9. Find each year and the average number of content release in India on netflix. 
-return top 5 years with highest avg content release!
-
-```sql
-SELECT 
-	EXTRACT(YEAR FROM TO_DATE(date_added, 'Month DD, YYYY')) AS year,
-	COUNT(*) AS yearly_content,
-	ROUND(
-COUNT(*)::numeric/(SELECT COUNT(*) FROM netflix WHERE country = 'India')::numeric * 100, 2) AS avg_content_per_year
-	FROM netflix
-	WHERE country = 'India'
-	GROUP BY 1;
-```
-
-### 10. List All Movies that are Documentaries
-
-```sql
-SELECT * FROM netflix
-WHERE 
-	listed_in LIKE '%Documentaries%';
-```
-
-### 11. Find All Content Without a Director
-
-```sql
-SELECT * FROM netflix
-WHERE 
-	director IS NULL;
-```
-
-### 12. Find How Many Movies Actor 'Salman Khan' Appeared in the Last 12 Years
-
-```sql
-SELECT * FROM netflix
-WHERE 
- 	casts ILIKE '%Salman Khan%'
-	 AND
-	 release_year > EXTRACT(YEAR FROM CURRENT_DATE) - 12;
-```
-
-## Findings and Conclusion
-
-- **Content Distribution:** The dataset contains a diverse range of movies and TV shows with varying ratings and genres.
-- **Common Ratings:** Insights into the most common ratings provide an understanding of the content's target audience.
-- **Geographical Insights:** The top countries and the average content releases by India highlight regional content distribution.
-- **Content Categorization:** Categorizing content based on specific keywords helps in understanding the nature of content available on Netflix.
-
-This analysis provides a comprehensive view of Netflix's content and can help inform content strategy and decision-making.
+📌 If you find this project useful, ⭐ the repo and contribute! 🚀  
